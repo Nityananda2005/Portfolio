@@ -61,6 +61,40 @@ function loadTheme() {
     icon.className = savedTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
 }
 
+// Counting animation for about section stats
+function animateCounters() {
+    const counters = document.querySelectorAll('.stat-number');
+    
+    counters.forEach(counter => {
+        const target = parseInt(counter.textContent.replace('+', ''));
+        const duration = 1000; // 1 seconds
+        const increment = target / (duration / 17); // 60fps
+        let current = 0;
+        
+        const updateCounter = () => {
+            current += increment;
+            if (current < target) {
+                counter.textContent = Math.floor(current) + '+';
+                requestAnimationFrame(updateCounter);
+            } else {
+                counter.textContent = target + '+';
+            }
+        };
+        
+        // Start animation when element is visible
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    updateCounter();
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
+        
+        observer.observe(counter);
+    });
+}
+
 // Initialize everything when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     try {
@@ -114,6 +148,7 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(() => {
             animateOnScroll();
             animateSkillBars();
+            animateCounters();
         }, 100);
         
         // Prevent theme toggle when interacting with form inputs
